@@ -19,6 +19,7 @@ use std::{
 };
 
 pub fn convert(matches: &clap::ArgMatches) {
+    println!("[+]\tBegin vcf2msa convert.");
     // parse command line args
     let outdir = matches.value_of("outdir").unwrap();
     // create directory for output
@@ -65,6 +66,9 @@ pub fn convert(matches: &clap::ArgMatches) {
             let fasta_reader = fasta::Reader::from_file(path).unwrap().records();
             for record in fasta_reader {
                 let record = record.expect("[-]\tError during fasta record parsing.");
+                if !record.seq().len() > 0 {
+                    continue;
+                }
                 // if the iteration of the fasta == header name
                 if record.id() == id {
                     writeln!(
@@ -77,6 +81,11 @@ pub fn convert(matches: &clap::ArgMatches) {
                     .unwrap_or_else(|_| eprintln!("[-]\tError in writing to file."));
                 }
             }
+            println!(
+                "[+]\t\tEntry: {} finished.",
+                Path::new(path).file_stem().unwrap().to_str().unwrap()
+            );
         }
+        println!("[+]\tID: {} finished.", id);
     }
 }
