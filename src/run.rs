@@ -1,7 +1,7 @@
 use bio::io::fasta;
 use rust_htslib::bcf::{Read, Reader};
-use std::fs::File;
 use std::fs::OpenOptions;
+use std::fs::{create_dir_all, File};
 use std::io::Read as IoRead;
 use std::io::{BufWriter, Write};
 use std::path::Path;
@@ -11,9 +11,17 @@ use crate::utils;
 // in desperate need of some optimisations
 
 pub fn run(matches: &clap::ArgMatches) {
+    // input paths
     let path = matches.value_of("vcf").unwrap();
-
     let fasta_path = matches.value_of("fasta").unwrap();
+    // outdir
+    let outdir = matches.value_of("outdir").unwrap();
+
+    // create directory for output
+    if let Err(e) = create_dir_all(outdir) {
+        eprintln!("[-]\tCreate directory error: {}", e.to_string());
+    }
+
     let fasta_path = Path::new(fasta_path).canonicalize().unwrap();
     let fasta_reader = fasta::Reader::from_file(&fasta_path).unwrap().records();
 
@@ -34,7 +42,7 @@ pub fn run(matches: &clap::ArgMatches) {
     for file in &s_mns_vec {
         // remove all dots and slashes...
         let s = file.replace(&['.', '/'][..], "");
-        let path = format!("./{}.fasta", s);
+        let path = format!("{}/{}.fasta", outdir, s);
         File::create(&path).expect("Unable to create file");
         path_vec.push(path);
     }
@@ -99,7 +107,7 @@ pub fn run(matches: &clap::ArgMatches) {
 
             // if current header == contig
 
-            for (index, path) in (1..s_mns_vec.len()).zip(path_vec.iter()) {
+            for (index, path) in (0..s_mns_vec.len()).zip(path_vec.iter()) {
                 let gt = genotypes.get(index);
                 // write up to the variant position and the variant itself
                 // bcf record, first base has position 1 (so minus one?)

@@ -27,6 +27,13 @@ fn main() {
                         .takes_value(true)
                         .required_unless("print")
                         .help("The input fasta file."),
+                )
+                .arg(
+                    Arg::with_name("outdir")
+                        .short("o")
+                        .long("outdir")
+                        .default_value("vcf2msa")
+                        .help("The name of the output directory."),
                 ),
         )
         .get_matches();

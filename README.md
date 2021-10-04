@@ -29,3 +29,5 @@ OPTIONS:
     -f, --fasta <fasta>    The input fasta file.
     -v, --vcf <vcf>        The input VCF file.
 ```
+
+Currently outputs a bunch of fastas in the executed dir, one for each sample in the VCF. Working on combining these into actual MSA's.
