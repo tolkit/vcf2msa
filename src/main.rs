@@ -3,6 +3,7 @@
 
 use clap::{App, Arg};
 use std::process;
+use vcf2msa::convert;
 use vcf2msa::run;
 
 fn main() {
@@ -36,6 +37,26 @@ fn main() {
                         .help("The name of the output directory."),
                 ),
         )
+        .subcommand(
+            clap::SubCommand::with_name("convert")
+                .about("Convert output fastas to one fasta per chromosome.")
+                .arg(
+                    Arg::with_name("fastas")
+                        .short("f")
+                        .long("fastas")
+                        .takes_value(true)
+                        .required(true)
+                        .multiple(true)
+                        .help("The input fasta files."),
+                )
+                .arg(
+                    Arg::with_name("outdir")
+                        .short("o")
+                        .long("outdir")
+                        .default_value(".")
+                        .help("The name of the output directory."),
+                ),
+        )
         .get_matches();
 
     let subcommand = matches.subcommand();
@@ -43,6 +64,10 @@ fn main() {
         "run" => {
             let matches = subcommand.1.unwrap();
             run::run(matches);
+        }
+        "convert" => {
+            let matches = subcommand.1.unwrap();
+            convert::convert(matches);
         }
         _ => {
             println!("Subcommand invalid, run with '--help' for subcommand options. Exiting.");

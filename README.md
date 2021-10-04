@@ -31,3 +31,23 @@ OPTIONS:
 ```
 
 Currently outputs a bunch of fastas in the executed dir, one for each sample in the VCF. Working on combining these into actual MSA's.
+
+The below should do this. Again yet to test properly. E.g:
+
+`vcf2msa convert -f *.fasta -o outdir`
+
+```bash
+vcf2msa-convert 
+Convert output fastas to one fasta per chromosome.
+
+USAGE:
+    vcf2msa convert [OPTIONS] --fastas <fastas>...
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -f, --fastas <fastas>...    The input fasta files.
+    -o, --outdir <outdir>       The name of the output directory. [default: .]
+```
