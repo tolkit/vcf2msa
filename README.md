@@ -4,6 +4,10 @@ Given an input reference fasta file and a VCF, make a multiple sequence alignmen
 
 No testing, no guarantees. Usual rust installation and build.
 
+Currently only concerns diploid SNPs. Indels/polyploid calls are ignored.
+
+## Installation
+
 ```bash
 git clone https://github.com/tolkit/vcf2msa && cd vcf2msa && cargo build --release
 ```
@@ -26,8 +30,9 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -f, --fasta <fasta>    The input fasta file.
-    -v, --vcf <vcf>        The input VCF file.
+    -f, --fasta <fasta>      The input fasta file.
+    -o, --outdir <outdir>    The name of the output directory. [default: vcf2msa]
+    -v, --vcf <vcf>          The input VCF file.
 ```
 
 Currently outputs a bunch of fastas in the executed dir, one for each sample in the VCF. Working on combining these into actual MSA's.

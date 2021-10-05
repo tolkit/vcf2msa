@@ -11,6 +11,7 @@ use crate::utils;
 // in desperate need of some optimisations
 
 pub fn run(matches: &clap::ArgMatches) {
+    println!("[+]\tBegin vcf2msa run.");
     // input paths
     let path = matches.value_of("vcf").unwrap();
     let fasta_path = matches.value_of("fasta").unwrap();
@@ -63,7 +64,7 @@ pub fn run(matches: &clap::ArgMatches) {
                 .open(file)
                 .expect("Could not open file.");
             let mut f = BufWriter::new(f);
-            let header = format!("\n>{}\n", cur_header);
+            let header = format!(">{}\n", cur_header);
             f.write(header.as_bytes()).expect("Unable to write data");
 
             f.flush().expect("Could not flush.");
@@ -97,15 +98,17 @@ pub fn run(matches: &clap::ArgMatches) {
                 continue;
             }
 
-            // if ref/alt > 1, skip. These are the indels
+            // if ref/alt > 1, skip.
+            // these are the indels/polyploid... etc...
             let alleles = bcf_record.alleles();
+            if alleles.len() > 2 {
+                continue;
+            }
+            // get alleles
             let ref_allele = std::str::from_utf8(&alleles[0]).unwrap();
             let alt_allele = std::str::from_utf8(&alleles[1]).unwrap();
-
             // get genotypes
             let genotypes = bcf_record.genotypes().expect("Error reading genotypes");
-
-            // if current header == contig
 
             for (index, path) in (0..s_mns_vec.len()).zip(path_vec.iter()) {
                 let gt = genotypes.get(index);
@@ -123,18 +126,31 @@ pub fn run(matches: &clap::ArgMatches) {
                     .open(path)
                     .expect("Could not open file.");
                 let mut f = BufWriter::new(f);
-                // println!("{}, {}", index, path);
-                // println!("{} -> {}", pos, bcf_record_postion);
+
                 // write the sequence
                 f.write(sequence).expect("Unable to write data");
                 // write the variant
                 let base = utils::return_base(gt, ref_allele, alt_allele);
                 f.write(base.as_bytes()).expect("Unable to write data");
                 f.flush().expect("Could not flush.");
+                // TODO: currently not writing the sequence from the last variant to the chromosome end...
+                // annoying but not end-of-the-worldy
             }
+            // is this right?
             pos = bcf_record_postion + 1;
         }
-        println!("Fasta ID: {} processed.", cur_header);
+        // add newlines to each of the fasta ends.
+        for path in path_vec.iter() {
+            let f = OpenOptions::new()
+                .append(true)
+                .open(path)
+                .expect("Could not open file.");
+            let mut f = BufWriter::new(f);
+            // write the newlines
+            f.write("\n".as_bytes()).expect("Unable to write data");
+        }
+
+        println!("[+]\tFasta ID: {} processed.", cur_header);
         // set position back to zero
         pos = 0;
     }
