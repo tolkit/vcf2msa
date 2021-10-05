@@ -66,7 +66,7 @@ pub fn convert(matches: &clap::ArgMatches) {
             let fasta_reader = fasta::Reader::from_file(path).unwrap().records();
             for record in fasta_reader {
                 let record = record.expect("[-]\tError during fasta record parsing.");
-                if !record.seq().len() > 0 {
+                if record.seq().len() == 0 {
                     continue;
                 }
                 // if the iteration of the fasta == header name
