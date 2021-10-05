@@ -6,6 +6,8 @@ No testing, no guarantees. Usual rust installation and build.
 
 Currently only concerns diploid SNPs. Indels/polyploid calls are ignored.
 
+Inspired by this C version of vcf2msa <a href="https://github.com/alshai/vcf2msa">here</a>.
+
 ## Installation
 
 ```bash
